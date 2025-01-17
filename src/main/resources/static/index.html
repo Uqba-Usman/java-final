@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM API Response</title>
+</head>
+<body>
+<h1>Chat with LLM</h1>
+<form id="chatForm">
+  <label for="query">Enter your query:</label>
+  <input type="text" id="query" name="query" required>
+  <button type="submit">Submit</button>
+</form>
+<h2>Response:</h2>
+<pre id="responseOutput"></pre>
+
+<script>
+  document.getElementById('chatForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const query = document.getElementById('query').value;
+
+      const responseOutput = document.getElementById('responseOutput');
+      responseOutput.textContent = 'Loading...';
+
+      try {
+          const response = await fetch('http://localhost:8081/api/v1/llm/chat', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ query: query }),
+          });
+
+          if (response.ok) {
+              const jsonResponse = await response.json();
+              responseOutput.textContent = JSON.stringify(jsonResponse, null, 2);
+          } else {
+              responseOutput.textContent = `Error: ${response.status} - ${response.statusText}`;
+          }
+      } catch (error) {
+          responseOutput.textContent = `Error: ${error.message}`;
+      }
+  });
+</script>
+</body>
+</html>
