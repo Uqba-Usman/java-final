@@ -4,18 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LLM API Response</title>
+  <style>
+    body {
+      background-color: #f0f8ff; /* Light blue background color */
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .word-list {
+      margin-top: 20px;
+    }
+    .word-list span {
+      cursor: pointer;
+      color: blue;
+      text-decoration: underline;
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
-<h1>Chat with LLM</h1>
+<h1>Role-based Roadmaps</h1>
 <form id="chatForm">
   <label for="query">Enter your query:</label>
   <input type="text" id="query" name="query" required>
   <button type="submit">Submit</button>
 </form>
+
 <h2>Response:</h2>
 <pre id="responseOutput"></pre>
 
+<div class="word-list" id="wordList">
+  <h3>Suggested Roles</h3>
+  <span>Frontend</span>
+  <span>Backend</span>
+  <span>DevOps</span>
+  <span>Full Stack</span>
+  <span>AI Engineer</span>
+</div>
+
 <script>
+  // Handle form submission
   document.getElementById('chatForm').addEventListener('submit', async function (event) {
       event.preventDefault();
       const query = document.getElementById('query').value;
@@ -40,6 +71,14 @@
           }
       } catch (error) {
           responseOutput.textContent = `Error: ${error.message}`;
+      }
+  });
+
+  // Handle word clicks
+  document.getElementById('wordList').addEventListener('click', function (event) {
+      if (event.target.tagName === 'SPAN') {
+          const word = event.target.textContent;
+          document.getElementById('query').value = word;
       }
   });
 </script>
