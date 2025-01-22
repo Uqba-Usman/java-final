@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 800px; /* Increased width for better alignment */
+            width: 90%;
+            text-align: left; /* Align text to the left */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #ff7e5f;
+            text-align: center; /* Centered title remains */
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.6; /* Added line spacing for readability */
+            word-wrap: break-word;
+        }
+        button {
+            background: #ff7e5f;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            align-self: flex-start; /* Align the button to the left */
+        }
+        button:hover {
+            background: #e86442;
+        }
+        ul {
+            margin: 0;
+            padding-left: 20px; /* Indentation for list items */
+            list-style: disc;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 id="skillTitle">Skill Details</h1>
+    <p id="skillDescription">Loading...</p>
+    <button onclick="goBack()">Go Back</button>
+</div>
+
+<script>
+    // Function to get query parameters
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Load skill details
+    async function loadSkillDetails() {
+        const skill = getQueryParam('skill');
+        if (skill) {
+            document.getElementById('skillTitle').innerText = skill;
+
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/llm/detail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: skill }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const detail = data.html;
+
+                    // Display the skill details
+                    document.getElementById('skillDescription').innerHTML = detail;
+                } else {
+                    document.getElementById('skillDescription').innerText =
+                        `Failed to fetch details for ${skill}. Please try again later.`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('skillDescription').innerText =
+                    'An error occurred while fetching skill details. Please try again later.';
+            }
+        } else {
+            document.getElementById('skillDescription').innerText = 'No skill selected.';
+        }
+    }
+
+    // Back button functionality
+    function goBack() {
+        window.location.href = 'index.html';
+    }
+
+    // Load details on page load
+    window.onload = loadSkillDetails;
+</script>
+</body>
+</html>

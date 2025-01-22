@@ -3,94 +3,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LLM API Response</title>
+  <title>Skill Finder</title>
   <style>
     body {
-      background-color: #f0f8ff; /* Light blue background color */
       font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #007bff, #00c6ff);
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh; /* Limit the container height */
+      overflow: hidden; /* Prevent overflow */
     }
     h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #007bff;
+    }
+    input[type="text"] {
+      width: calc(100% - 20px);
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+      font-size: 18px;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+    button {
+      background: #007bff;
+      color: #ffffff;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      outline: none;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .skills {
+      margin-top: 30px;
+      text-align: left;
+      overflow-y: auto; /* Enable vertical scrolling */
+      max-height: 60vh; /* Limit the height of the skills list */
+      padding-right: 10px; /* Add space for the scrollbar */
+    }
+    .skills ul {
+      list-style: none;
+      padding: 0;
+    }
+    .skills ul li {
+      background: #f8f9fa;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 5px;
+      font-size: 16px;
+      color: #333;
+      cursor: pointer;
+    }
+    .skills ul li a {
+      text-decoration: none;
       color: #333;
     }
-    .word-list {
-      margin-top: 20px;
-    }
-    .word-list span {
-      cursor: pointer;
-      color: blue;
-      text-decoration: underline;
-      margin-right: 10px;
-    }
-    .response-panel {
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      max-height: 300px;
-      overflow-y: auto;
-      font-family: monospace; /* Optional for better JSON readability */
+    .skills ul li:hover {
+      background: #e9ecef;
     }
   </style>
 </head>
 <body>
-<h1>Role-based Roadmaps</h1>
-<form id="chatForm">
-  <label for="query">Enter your query:</label>
-  <input type="text" id="query" name="query" required>
-  <button type="submit">Submit</button>
-</form>
-
-<div id="responsePanel" class="response-panel">Awaiting your query...</div>
-
-<div class="word-list" id="wordList">
-  <h3>Suggested Roles</h3>
-  <span>Frontend</span>
-  <span>Backend</span>
-  <span>DevOps</span>
-  <span>Full Stack</span>
-  <span>AI Engineer</span>
+<div class="container">
+  <h1>Skill Finder</h1>
+  <input type="text" id="queryInput" placeholder="Enter a technical field (e.g., DevOps)" />
+  <button onclick="fetchSkills()">Find Skills</button>
+  <div id="skillsContainer" class="skills"></div>
 </div>
 
 <script>
-  // Handle form submission
-  document.getElementById('chatForm').addEventListener('submit', async function (event) {
-      event.preventDefault();
-      const query = document.getElementById('query').value;
+  async function fetchSkills() {
+    const queryInput = document.getElementById('queryInput').value;
+    const skillsContainer = document.getElementById('skillsContainer');
 
-      const responsePanel = document.getElementById('responsePanel');
-      responsePanel.textContent = 'Loading...';
+    // Clear previous results
+    skillsContainer.innerHTML = '';
 
-      try {
-          const response = await fetch('http://localhost:8081/api/v1/llm/chat', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ query: query }),
+    if (!queryInput.trim()) {
+      skillsContainer.innerHTML = '<p style="color:red;">Please enter a technical field.</p>';
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/llm/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: queryInput }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const skills = data.skills;
+
+        if (skills && skills.length > 0) {
+          let html = '<h3>Required Skills:</h3><ul>';
+          skills.forEach(skill => {
+            html += `<li><a href="details.html?skill=${encodeURIComponent(skill)}">${skill}</a></li>`;
           });
-
-          if (response.ok) {
-              const jsonResponse = await response.json();
-              responsePanel.textContent = jsonResponse.response || 'No response received'; // Show only the response value
-          } else {
-              responsePanel.textContent = `Error: ${response.status} - ${response.statusText}`;
-          }
-      } catch (error) {
-          responsePanel.textContent = `Error: ${error.message}`;
+          html += '</ul>';
+          skillsContainer.innerHTML = html;
+        } else {
+          skillsContainer.innerHTML = '<p>No skills found for the provided field.</p>';
+        }
+      } else {
+        skillsContainer.innerHTML = '<p style="color:red;">Failed to fetch skills. Please try again later.</p>';
       }
-  });
-
-  // Handle word clicks
-  document.getElementById('wordList').addEventListener('click', function (event) {
-      if (event.target.tagName === 'SPAN') {
-          const word = event.target.textContent;
-          document.getElementById('query').value = word;
-      }
-  });
+    } catch (error) {
+      console.error('Error:', error);
+      skillsContainer.innerHTML = '<p style="color:red;">An error occurred while fetching skills. Please try again later.</p>';
+    }
+  }
 </script>
 </body>
 </html>

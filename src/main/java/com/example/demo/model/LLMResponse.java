@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LLMResponse {
     private String status;
-    private String response;
+    private Object response;
 
-    public LLMResponse(String status, String response) {
+    public LLMResponse(String status, Object response) {
         this.status = status;
         this.response = response;
     }
@@ -24,11 +24,11 @@ public class LLMResponse {
         this.status = status;
     }
 
-    public String getResponse() {
+    public Object getResponse() {
         return response;
     }
 
-    public void setResponse(String response) {
+    public void setResponse(Object response) {
         this.response = response;
     }
 }
