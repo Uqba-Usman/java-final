@@ -93,9 +93,9 @@
 </head>
 <body>
 <div class="container">
-  <h1>Skill Finder</h1>
-  <input type="text" id="queryInput" placeholder="Enter a technical field (e.g., DevOps)" />
-  <button onclick="fetchSkills()">Find Skills</button>
+  <h1>Roadmap Finder</h1>
+  <input type="text" id="queryInput" placeholder="Enter a technical field (e.g., DevOps, etc)" />
+  <button onclick="fetchSkills()">Find</button>
   <div id="skillsContainer" class="skills"></div>
 </div>
 
@@ -113,7 +113,7 @@
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/llm/chat', {
+      const response = await fetch('http://localhost:8080/api/v1/llm/skills', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

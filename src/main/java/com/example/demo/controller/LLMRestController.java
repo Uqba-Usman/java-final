@@ -39,7 +39,7 @@ public class LLMRestController {
 //
     @Autowired
     OpenAiChatModel chatModel;
-    @PostMapping("/chat")
+    @PostMapping("/skills")
     public ResponseEntity<Map<String, Object>> chat(@RequestBody LLMRequest llmRequest) {
         try {
             System.out.println("Query: " + llmRequest.getQuery());
@@ -52,6 +52,7 @@ public class LLMRestController {
             String rawResponse = response.getResult().getOutput().getContent();
 
             System.out.println("Raw Response: " + rawResponse);
+
 
             // Clean up the response
             rawResponse = rawResponse.trim()
@@ -76,7 +77,7 @@ public class LLMRestController {
         try {
             System.out.println("Query: " + llmRequest.getQuery());
 
-            Prompt prompt = new Prompt("Provide a detailed explanation of the skill I specify. The response should outline what one needs to know about this skill to progress from a basic to a professional level. The explanation should be divided into sections for beginner, intermediate, and advanced levels, with each section listing key concepts, tools, and practices.\n" +
+            Prompt prompt = new Prompt("Provide a detailed explanation of the skill I specify. The response should outline what one needs to know about this skill to progress from a basic to a professional level. The explanation should be divided into sections for beginner, intermediate, and advanced levels, with each section listing key concepts, tools, and practices. Also gave me some reference links to study\n" +
                     "\n" +
                     "The response should be formatted as a JSON object with a single key, \"html\", where the value is a string of HTML. The HTML should be structured with headings and lists for clarity. Exclude code block markers or any unnecessary formatting, providing only the content that can be embedded in the <body> of an HTML document." + llmRequest.getQuery());
 
